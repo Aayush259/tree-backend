@@ -1,0 +1,23 @@
+
+services:
+    db:
+        image: postgres:15
+        container_name: tree_db
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        networks:
+            - tree_network
+        restart: always
+
+volumes:
+    postgres_data:
+
+networks:
+    tree_network:
+        driver: bridge
