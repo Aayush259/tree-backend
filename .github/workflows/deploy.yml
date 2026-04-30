@@ -25,8 +25,9 @@ jobs:
             pip install --upgrade pip
             pip install -r requirements.txt
             
-            # Database Migrations
+            # Database Migrations and Static Files
             python manage.py migrate
+            python manage.py collectstatic --noinput
             
             # Ensure Docker Compose (Database only) is running
             docker compose up -d
