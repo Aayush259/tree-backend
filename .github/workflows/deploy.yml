@@ -29,6 +29,6 @@ jobs:
             python manage.py migrate
             
             # Start/Restart Services
-            docker-compose up -d
+            docker compose up -d
             
             # sudo systemctl restart gunicorn
