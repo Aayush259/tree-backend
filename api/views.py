@@ -107,4 +107,39 @@ class TreeView(APIView):
                 'message': 'An error occurred',
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+    def delete(self, request):
+        try:
+            """
+            Delete a node
+            """
+            node_id = request.query_params.get('id')
+
+            if not node_id:
+                return Response({
+                    'status': 'error',
+                    'message': 'Node ID is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            node = Node.objects.get(id=node_id)
+            if not node:
+                return Response({
+                    'status': 'error',
+                    'message': 'Node not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            node.delete()
+
+            return Response({
+                'status': 'success',
+                'message': 'Node deleted successfully'
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': 'An error occurred',
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
