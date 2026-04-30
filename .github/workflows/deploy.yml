@@ -28,7 +28,15 @@ jobs:
             # Database Migrations
             python manage.py migrate
             
-            # Start/Restart Services
+            # Ensure Docker Compose (Database only) is running
             docker compose up -d
             
-            # sudo systemctl restart gunicorn
+            # Restart Gunicorn
+            # 1. Kill any existing gunicorn processes
+            pkill gunicorn || true
+            
+            # 2. Start Gunicorn in the background
+            # We use nohup to keep it running after the SSH session closes
+            nohup gunicorn --bind 0.0.0.0:8000 tree.wsgi:application > gunicorn.log 2>&1 &
+            
+            echo "Deployment successful. Gunicorn restarted."
