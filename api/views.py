@@ -10,10 +10,17 @@ class TreeView(APIView):
     def get(self, request):
         try:
             """
-            Get all root nodes (trees)
+            Get all nodes
             """
-            parents = Node.objects.filter(parent__isnull=True)
-            serializer = NodeSerializer(parents, many=True)
+            parent_id = request.query_params.get('parent_id')
+
+            if parent_id:
+                # Get children for specific node
+                nodes = Node.objects.filter(parent=parent_id)
+            else:
+                # Get all root nodes
+                nodes = Node.objects.filter(parent__isnull=True)
+            serializer = NodeSerializer(nodes, many=True)
             return Response({
                 'status': 'success',
                 'message': 'Trees fetched successfully',
@@ -30,10 +37,10 @@ class TreeView(APIView):
     def post(self, request):
         try:
             """
-            Create a new tree (root node)
+            Create a new node
             """
-            tree_data = request.data
-            serializer = NodeSerializer(data=tree_data, partial=True)
+            node_data = request.data
+            serializer = NodeSerializer(data=node_data, partial=True)
 
             if not serializer.is_valid():
                 return Response({
@@ -46,7 +53,7 @@ class TreeView(APIView):
 
             return Response({
                 'status': 'success',
-                'message': 'Tree created successfully',
+                'message': 'Node created successfully',
                 'data': serializer.data
             }, status=status.HTTP_201_CREATED)
 
@@ -60,21 +67,21 @@ class TreeView(APIView):
     def put(self, request):
         try:
             """
-            Update a tree (root node)
+            Update a node
             """
-            tree_id = request.query_params.get('id')
+            node_id = request.query_params.get('id')
 
-            if not tree_id:
+            if not node_id:
                 return Response({
                     'status': 'error',
-                    'message': 'Tree ID is required'
+                    'message': 'Node ID is required'
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            node = Node.objects.get(id=tree_id, parent=None)
+            node = Node.objects.get(id=node_id)
             if not node:
                 return Response({
                     'status': 'error',
-                    'message': 'Tree not found'
+                    'message': 'Node not found'
                 }, status=status.HTTP_404_NOT_FOUND)
             
             serializer = NodeSerializer(node, data=request.data, partial=True)
@@ -90,7 +97,7 @@ class TreeView(APIView):
 
             return Response({
                 'status': 'success',
-                'message': 'Tree updated successfully',
+                'message': 'Node updated successfully',
                 'data': serializer.data
             }, status=status.HTTP_200_OK)
 
@@ -100,3 +107,4 @@ class TreeView(APIView):
                 'message': 'An error occurred',
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
