@@ -13,6 +13,7 @@ class TreeView(APIView):
             Get all nodes
             """
             parent_id = request.query_params.get('parent_id')
+            full = request.query_params.get('all') == 'true'
 
             if parent_id:
                 # Get children for specific node
@@ -20,7 +21,8 @@ class TreeView(APIView):
             else:
                 # Get all root nodes
                 nodes = Node.objects.filter(parent__isnull=True)
-            serializer = NodeSerializer(nodes, many=True)
+            
+            serializer = NodeSerializer(nodes, many=True, context={'full': full})
             return Response({
                 'status': 'success',
                 'message': 'Trees fetched successfully',
